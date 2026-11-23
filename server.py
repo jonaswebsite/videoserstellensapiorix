@@ -30,7 +30,7 @@ from typing import Dict, List, Optional, Union
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
 from core.config import get_api_key, set_api_key, delete_api_key, get_api_key_source, get_working_dir, AVAILABLE_VOICES, DURATION_FRAME_MAP, get_workspaces, add_workspace, remove_workspace, set_active_workspace, get_active_workspace, REGRESSION_WORKING_DIR_ENV, get_watermark_config, set_watermark_config, WATERMARK_PROMO_TEXT_ZH, WATERMARK_PROMO_TEXT_EN
 from core.pipelines import (
@@ -297,10 +297,11 @@ if os.path.exists(static_dir):
 
 @app.get("/")
 async def root():
-    index_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return {"message": "Agnes Video Generator API"}
+    # The old standalone Agnes UI is retired; SAPIORIX owns the user-facing studio.
+    return RedirectResponse(
+        url="https://nova-ki-anq7.onrender.com/video.html",
+        status_code=307,
+    )
 
 
 # ═══════════════════════════════════════════════════
