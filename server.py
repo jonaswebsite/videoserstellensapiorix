@@ -28,6 +28,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Union
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Form, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 
@@ -221,7 +222,24 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Agnes Video Generator", lifespan=lifespan)
+app = FastAPI(title="SAPIORIX Video Engine", lifespan=lifespan)
+
+# Allow the SAPIORIX Studio frontend to call this video API directly.
+_allowed_origins = [
+    origin.strip().rstrip("/")
+    for origin in os.environ.get(
+        "CORS_ORIGINS",
+        "https://nova-ki-anq7.onrender.com"
+    ).split(",")
+    if origin.strip()
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_allowed_origins,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 def get_upload_dir() -> str:
     """返回当前激活工作目录下的 uploads 子目录。"""
